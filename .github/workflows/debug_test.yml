@@ -1,0 +1,81 @@
+name: debug_test
+
+on: [push]
+
+jobs:
+  debug-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_DATABASE: share_money_api_server_test
+          MYSQL_USER: share_money_api_server
+          MYSQL_PASSWORD: password
+          MYSQL_ROOT_PASSWORD: password
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+        # redis:
+          # image: redis
+          # ports:
+            # - 6379:6379
+
+    env:
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_DATABASE: share_money_api_server_test
+      DB_USERNAME: root
+      DB_PASSWORD: password
+      # REDIS_HOST: 127.0.0.1
+      # REDIS_PORT: 6379
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer, cs2pr
+          coverage: pcov
+
+      - name: Cache composer
+        id: composer-cache
+        uses: actions/cache@v3
+        with:
+          path: ./vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+
+      - name: Composer install
+        env:
+          COMPOSER_MEMORY_LIMIT: -1
+        if: ${{ !steps.composer-cache.outputs.cache-hit }}
+        run: composer install -q --no-ansi --no-interaction --no-suggest --optimize-autoloader --prefer-dist
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v35.7.1
+
+      - name: Set up Environment
+        run: |
+          cp .env.example .env
+          sed -i 's/DB_DATABASE=.*/DB_DATABASE=share_money_api_server_test/' .env
+          php artisan key:generate
+
+      - name: Composer Dump Autoload
+        run: composer dump-autoload
+
+      - name: Migrate
+        run: php artisan migrate
+
+      - name: Run tests
+        run: php artisan test
