@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 class AccountLockException extends Exception
 {
     protected $message = 'アカウントをロックしました。しばらく経ってから再度ログインしてください。';
-    
+
     protected $code = Response::HTTP_UNPROCESSABLE_ENTITY;
 
     /**
@@ -16,9 +16,9 @@ class AccountLockException extends Exception
      * @return void
      */
     public function render($request)
-      {
-          return response()->json([
-              'message' => $this->message
-          ], $this->code);
-      }
+    {
+        return response()->json([
+            'message' => $this->message,
+        ], $this->code);
+    }
 }

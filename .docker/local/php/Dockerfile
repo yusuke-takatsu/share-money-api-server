@@ -22,6 +22,8 @@ RUN curl -sL https://deb.nodesource.com/setup_lts.x | bash -
 RUN apt install -y nodejs
 RUN npm install --global yarn
 
+RUN apt-get update && apt-get install -y git
+
 RUN apt install -y fish
 
 COPY entrypoint.sh /opt/docker-entrypoint.sh

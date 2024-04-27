@@ -42,9 +42,9 @@ class RouteServiceProvider extends ServiceProvider
     private function userApiROutes(): void
     {
         Route::domain(config('app_domain'))
-          ->prefix('api/v1')
-          ->middleware('api')
-          ->as('api.')
-          ->group(base_path('routes/user/api.php'));
+            ->prefix('api/v1')
+            ->middleware('api')
+            ->as('api.')
+            ->group(base_path('routes/user/api.php'));
     }
 }
