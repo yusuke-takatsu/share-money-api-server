@@ -8,12 +8,10 @@ use App\Exceptions\User\Auth\AccountLockException;
 use App\Exceptions\User\Auth\LoginFailureException;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
-use Symfony\Component\HttpFoundation\Response;
 
 class LoginRequest extends FormRequest
 {
@@ -38,7 +36,7 @@ class LoginRequest extends FormRequest
     {
         return [
             'email' => ['required', 'string', 'email', 'max:255'],
-            'password' => ['required', 'string']
+            'password' => ['required', 'string'],
         ];
     }
 
@@ -49,7 +47,7 @@ class LoginRequest extends FormRequest
     {
         return [
             'email' => __('user.email'),
-            'password' => __('user.password')
+            'password' => __('user.password'),
         ];
     }
 
@@ -61,13 +59,13 @@ class LoginRequest extends FormRequest
         $this->ensureIsNotRateLimited();
 
         if (! Auth::guard('user')->attempt($this->only('email', 'password'), $this->boolean('remember'))) {
-          RateLimiter::hit($this->throttleKey(), self::LOGIN_LOCK_MINUTES);
+            RateLimiter::hit($this->throttleKey(), self::LOGIN_LOCK_MINUTES);
 
-          Log::info('ログインに失敗しました。', [
-              'method' => __METHOD__,
-          ]);
+            Log::info('ログインに失敗しました。', [
+                'method' => __METHOD__,
+            ]);
 
-         throw new LoginFailureException();
+            throw new LoginFailureException();
         }
 
         RateLimiter::clear($this->throttleKey());
@@ -89,7 +87,7 @@ class LoginRequest extends FormRequest
 
         event(new Lockout($this));
 
-       throw new AccountLockException();
+        throw new AccountLockException();
     }
 
     /**
@@ -97,6 +95,6 @@ class LoginRequest extends FormRequest
      */
     private function throttleKey(): string
     {
-      return Str::transliterate(Str::lower($this->input('email')).'|'.$this->ip());
+        return Str::transliterate(Str::lower($this->input('email')).'|'.$this->ip());
     }
 }
