@@ -1,24 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Exceptions\User\Auth;
 
-use Exception;
+use App\Exceptions\User\UserBaseException;
 use Symfony\Component\HttpFoundation\Response;
 
-class AccountLockException extends Exception
+class AccountLockException extends UserBaseException
 {
-    protected $message = 'アカウントをロックしました。しばらく経ってから再度ログインしてください。';
-
     protected $code = Response::HTTP_UNPROCESSABLE_ENTITY;
 
     /**
-     * @param [type] $request
-     * @return void
+     * {@inheritDoc}
      */
-    public function render($request)
+    public function getUIMessage(): string
     {
-        return response()->json([
-            'message' => $this->message,
-        ], $this->code);
+        return 'アカウントをロックしました。しばらく経ってから再度ログインしてください。';
     }
 }

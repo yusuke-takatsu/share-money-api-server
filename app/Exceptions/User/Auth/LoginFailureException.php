@@ -1,24 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Exceptions\User\Auth;
 
-use Exception;
+use App\Exceptions\User\UserBaseException;
 use Symfony\Component\HttpFoundation\Response;
 
-class LoginFailureException extends Exception
+class LoginFailureException extends UserBaseException
 {
-    protected $message = 'メールアドレスもしくはパスワードが不正です。';
-
     protected $code = Response::HTTP_UNPROCESSABLE_ENTITY;
 
     /**
-     * @param [type] $request
-     * @return void
+     * {@inheritDoc}
      */
-    public function render($request)
+    public function getUIMessage(): string
     {
-        return response()->json([
-            'message' => $this->message,
-        ], $this->code);
+        return 'メールアドレスもしくはパスワードが不正です。';
     }
 }
