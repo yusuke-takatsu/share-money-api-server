@@ -2,11 +2,15 @@
 
 namespace App\Exceptions;
 
+use App\Exceptions\Traits\CommonHandlerTrait;
+use App\Exceptions\Traits\UserHandlerTrait;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Throwable;
 
 class Handler extends ExceptionHandler
 {
+    use CommonHandlerTrait;
+    use UserHandlerTrait;
+
     /**
      * The list of the inputs that are never flashed to the session on validation exceptions.
      *
@@ -23,8 +27,8 @@ class Handler extends ExceptionHandler
      */
     public function register(): void
     {
-        $this->reportable(function (Throwable $e) {
-            //
-        });
+        $this->commonHandlerRegister();
+
+        $this->userHandlerRegister();
     }
 }
