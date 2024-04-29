@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\User\AuthController;
+use App\Http\Controllers\User\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,3 +16,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::post('/login', [AuthController::class, 'login'])->name('login');
+
+Route::middleware('auth:user')->group(function () {
+    Route::prefix('/profile')->name('profile.')->group(function () {
+        Route::post('/', [ProfileController::class, 'store'])->name('store');
+    });
+});
