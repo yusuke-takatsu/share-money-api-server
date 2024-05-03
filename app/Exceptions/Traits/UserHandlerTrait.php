@@ -3,7 +3,9 @@
 namespace App\Exceptions\Traits;
 
 use App\Exceptions\User\Auth\AccountLockException;
+use App\Exceptions\User\Auth\AuthErrorException;
 use App\Exceptions\User\Auth\LoginFailureException;
+use App\Exceptions\User\Profile\AlreadyExistException;
 use App\Exceptions\User\UserBaseException;
 use App\Http\Resources\User\UserCustomExceptionResouece;
 
@@ -15,6 +17,8 @@ trait UserHandlerTrait
     protected array $userCustumExceptions = [
         AccountLockException::class,
         LoginFailureException::class,
+        AuthErrorException::class,
+        AlreadyExistException::class,
     ];
 
     /**
