@@ -10,9 +10,9 @@ class S3Repository implements S3RepositoryInterface
     /**
      * {@inheritDoc}
      */
-    public function getUrl(string $filePath, string $diskName): string
+    public function getPublicUrl(string $filePath, string $diskName): string
     {
-        return Storage::disk($diskName)->url($filePath);
+        return Storage::disk($diskName)->url(config('filesystems.disks.s3_public.bucket').'/'.$filePath);
     }
 
     /**
