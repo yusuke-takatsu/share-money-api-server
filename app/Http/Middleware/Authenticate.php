@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Exceptions\User\Auth\AuthErrorException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
 use Illuminate\Http\Request;
 
@@ -17,9 +18,11 @@ class Authenticate extends Middleware
      */
     protected function unauthenticated($request, array $guards)
     {
-        if ($guards[0] === config('auth.guards.user')) {
+        if ($guards[0] === 'user') {
             throw new AuthErrorException();
         }
+
+        throw new AuthenticationException();
     }
 
     /**
