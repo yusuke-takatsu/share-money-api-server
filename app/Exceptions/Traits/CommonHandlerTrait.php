@@ -2,9 +2,11 @@
 
 namespace App\Exceptions\Traits;
 
+use App\Http\Resources\Common\NotFoundHttpExceptionResource;
 use App\Http\Resources\Common\ValidationExceptionResource;
 use Exception;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 trait CommonHandlerTrait
 {
@@ -13,6 +15,7 @@ trait CommonHandlerTrait
      */
     protected array $commonExceptionResourceSets = [
         ValidationException::class => ValidationExceptionResource::class,
+        NotFoundHttpException::class => NotFoundHttpExceptionResource::class,
     ];
 
     /**
