@@ -43,7 +43,7 @@ class StoreAction
 
         DB::transaction(function () use ($userId, $input) {
             if ($input->image !== null) {
-                $filePath = $this->uploadFileService->execute($input->image, true);
+                $filePath = $this->uploadFileService->execute($input->image);
             }
 
             Profile::query()->create($this->createInsertParams($userId, $input, $filePath));

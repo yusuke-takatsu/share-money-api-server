@@ -35,7 +35,7 @@ class UploadFileService
 
         $uploadedFilePath = $this->s3RepositoryInterface->put($diskName, $uploadedFile, $fileName);
 
-        $url = $this->s3RepositoryInterface->getUrl($uploadedFilePath, $diskName);
+        $url = $this->s3RepositoryInterface->getPublicUrl($uploadedFilePath, $diskName);
 
         Log::info('end'.__METHOD__);
 

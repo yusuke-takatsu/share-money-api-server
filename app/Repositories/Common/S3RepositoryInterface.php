@@ -10,7 +10,7 @@ interface S3RepositoryInterface
      * @param string $filePath
      * @return string
      */
-    public function getUrl(string $filePath, string $diskName): string;
+    public function getPublicUrl(string $filePath, string $diskName): string;
 
     /**
      * @param string $dir
