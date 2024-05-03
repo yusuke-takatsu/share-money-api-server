@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Builders;
 
-class ProfileBuilder
+use Illuminate\Database\Eloquent\Builder;
+
+class ProfileBuilder extends Builder
 {
 }

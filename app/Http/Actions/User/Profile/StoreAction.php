@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Actions\User\Profile;
 
+use App\Exceptions\User\Profile\AlreadyExistException;
 use App\Http\Actions\DataTransferObjects\Input\User\Profile\StoreActionInput;
 use App\Models\Profile;
 use App\Services\Common\UploadFileService;
@@ -36,12 +37,16 @@ class StoreAction
             Log::info('already registerd', [
                 'user_id' => $profile->id,
             ]);
+
+            throw new AlreadyExistException();
         }
 
-        DB::transaction(function () use ($input) {
-            $filePath = $this->uploadFileService->execute($input->image, true);
+        DB::transaction(function () use ($userId, $input) {
+            if ($input->image !== null) {
+                $filePath = $this->uploadFileService->execute($input->image, true);
+            }
 
-            Profile::query()->create($this->createInsertParams($input, $filePath));
+            Profile::query()->create($this->createInsertParams($userId, $input, $filePath));
         });
 
         Log::info('end'.__METHOD__);
@@ -52,12 +57,13 @@ class StoreAction
      * @param string $filePath
      * @return array
      */
-    private function createInsertParams(StoreActionInput $input, string $filePath): array
+    private function createInsertParams(int $userId, StoreActionInput $input, string $filePath): array
     {
         $inputParams = $input->toArray();
         unset($inputParams['image']);
 
         return array_merge([
+            'user_id' => $userId,
             'image' => $filePath,
         ], $inputParams);
     }
