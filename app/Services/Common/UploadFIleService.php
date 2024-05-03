@@ -29,12 +29,16 @@ class UploadFileService
 
         $fileName = Str::uuid().'.'.$extension;
 
-        $filePath = $isPrivate
-          ? config('aws.storage.private.disk_name').'/'.$fileName
-          : config('aws.storage.public.disk_name').'/'.$fileName;
+        $diskName = $isPrivate
+          ? config('aws.storage.private.disk_name')
+          : config('aws.storage.public.disk_name');
 
-        return $this->s3RepositoryInterface->put($filePath, $uploadedFile);
+        $uploadedFilePath = $this->s3RepositoryInterface->put($diskName, $uploadedFile, $fileName);
+
+        $url = $this->s3RepositoryInterface->getUrl($uploadedFilePath, $diskName);
 
         Log::info('end'.__METHOD__);
+
+        return $url;
     }
 }

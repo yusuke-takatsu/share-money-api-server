@@ -8,8 +8,15 @@ interface S3RepositoryInterface
 {
     /**
      * @param string $filePath
-     * @param UploadedFile $file
      * @return string
      */
-    public function put(string $filePath, UploadedFile $file): string;
+    public function getUrl(string $filePath, string $diskName): string;
+
+    /**
+     * @param string $dir
+     * @param UploadedFile $file
+     * @param string $fileName
+     * @return string
+     */
+    public function put(string $diskName, UploadedFile $file, string $fileName): string;
 }
