@@ -18,6 +18,6 @@ class IncomeCast implements Cast
      */
     public function cast(DataProperty $property, mixed $value, array $properties, CreationContext $context): Income
     {
-        return Income::fromValue($value);
+        return Income::fromValue(intval($value));
     }
 }

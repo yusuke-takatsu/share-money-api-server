@@ -18,6 +18,6 @@ class CompositionCast implements Cast
      */
     public function cast(DataProperty $property, mixed $value, array $properties, CreationContext $context): Composition
     {
-        return Composition::fromValue($value);
+        return Composition::fromValue(intval($value));
     }
 }

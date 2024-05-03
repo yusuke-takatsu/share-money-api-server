@@ -18,6 +18,6 @@ class JobCast implements Cast
      */
     public function cast(DataProperty $property, mixed $value, array $properties, CreationContext $context): Job
     {
-        return Job::fromValue($value);
+        return Job::fromValue(intval($value));
     }
 }
