@@ -21,7 +21,6 @@ class UserSeeder extends Seeder
         foreach(LazyCollection::range(1, 10) as $id) {
             $user = User::factory()->make([
                 'email' => "user$id@mail.com",
-                'name' => "user$id",
             ]);
 
             $users[] = $user->makeVisible(['password', 'remember_token'])->toArray();

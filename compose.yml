@@ -103,7 +103,6 @@ services:
         mc policy set public minio/public
         mc mb minio/private
         mc policy set private minio/private
-        mc policy set private minio/private
     environment:
       MINIO_ROOT_USER: access_key
       MINIO_ROOT_PASSWORD: secret_key
