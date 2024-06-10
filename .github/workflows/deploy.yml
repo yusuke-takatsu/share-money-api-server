@@ -11,6 +11,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Enable debug logging
+        run: echo "AWS_SDK_LOAD_CONFIG=1" >> $GITHUB_ENV
       - name: Configure aws credentials for develop
         uses: aws-actions/configure-aws-credentials@v2
         with:
