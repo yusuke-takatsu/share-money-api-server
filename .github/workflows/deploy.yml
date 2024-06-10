@@ -13,19 +13,17 @@ jobs:
     permissions:
       id-token: write
       contents: read
-      
+
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
 
-      - name: Set AWS environment variables
-        run: |
-          echo "AWS_REGION=${{ vars.AWS_REGION }}" >> $GITHUB_ENV
       - name: Configure aws credentials for develop
         uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           role-session-name: GithubActions@${{ github.sha }}
           aws-region: ${{ vars.AWS_REGION }}
+          
       - name: Verify AWS authentication
         run: aws s3 ls
