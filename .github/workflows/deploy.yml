@@ -16,9 +16,7 @@ jobs:
 
       - name: Set AWS environment variables
         run: |
-          echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
-          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
-          echo "AWS_DEFAULT_REGION=${{ secrets.AWS_REGION }}" >> $GITHUB_ENV
+          echo "AWS_REGION=${{ vars.AWS_REGION }}" >> $GITHUB_ENV
       - name: Configure aws credentials for develop
         uses: aws-actions/configure-aws-credentials@v2
         with:
