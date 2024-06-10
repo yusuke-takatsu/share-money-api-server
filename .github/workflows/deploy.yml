@@ -1,0 +1,20 @@
+name: deploy
+
+on:
+  push:
+    - develop
+
+jobs:
+  deploy:
+    name: Deploy app to AWS Fargate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure aws credentials for develop
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-session-name: GithubActions@${{ github.sha }}
+          aws-region: ${{ vars.AWS_REGION }}
+      - name: Verify AWS authentication
+        run: aws s3 ls
