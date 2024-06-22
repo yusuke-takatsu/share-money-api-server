@@ -53,7 +53,9 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ./vendor
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          # 。actions/cache で一度 キャッシュされたファイルは、任意に削除することができない
+          # そのため、composer.lock に変化は無いけれども何らかの事情でキャッシュを使用しないでジョブを実行したい場合 に、「v1」の部分を「v2」などに書き換えて強制的に key 不一致の状態を作り出せるよう、 このような key にしている
+          key: ${{ runner.os }}-composer-v1-${{ hashFiles('**/composer.lock') }}
 
       - name: Composer install
         env:
