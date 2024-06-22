@@ -47,5 +47,10 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1
         id: amazon-ecr-login
       
-      - name: check outputs name test
-        run: echo ${{ needs.check.outputs.env_name }}
+      - name: Build and push nginx image
+        uses: docker/build-push-action@4
+        with:
+          push: true
+          context: .
+          file: .docker/${{ needs.check.outputs.env_name }}/nginx/Dockerfile
+          tags: ${{ secrets.AWS_ECR_ACCOUNT_URL }}/${{ vars.PROJECT }}/${{ needs.check.outputs.env_name }}/nginx:${{ github.sha }}
