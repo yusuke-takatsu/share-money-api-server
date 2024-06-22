@@ -21,6 +21,7 @@ jobs:
             echo "env_name=develop" >> $GITHUB_OUTPUT
           elif [ "${{ github.ref }}" == "refs/heads/staging" ]; then
             echo "env_name=staging" >> $GITHUB_OUTPUT
+          fi
 
   deploy:
     name: Deploy app to AWS Fargate
