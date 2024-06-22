@@ -6,6 +6,22 @@ on:
       - develop
 
 jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      env_name: ${{ steps.branch-name-check.outputs.env_name }}
+    steps:
+      - name: Check branch name
+        id: branch-name-check
+        run: |
+          echo "Running on branch ${{inputs.branch}}"
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "env_name=production" >> $GITHUB_OUTPUT
+          elif [ "${{ github.ref }}" == "refs/heads/develop" ]; then
+            echo "env_name=develop" >> $GITHUB_OUTPUT
+          elif [ "${{ github.ref }}" == "refs/heads/staging" ]; then
+            echo "env_name=staging" >> $GITHUB_OUTPUT
+
   deploy:
     name: Deploy app to AWS Fargate
     runs-on: ubuntu-latest
@@ -25,5 +41,9 @@ jobs:
           role-session-name: GithubActions@${{ github.sha }}
           aws-region: ${{ vars.AWS_REGION }}
           
-      - name: Verify AWS authentication
-        run: aws s3 ls
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@b1
+        id: amazon-ecr-login
+      
+      - name: check outputs name test
+        run: echo ${{ needs.check.outputs.env_name }}
