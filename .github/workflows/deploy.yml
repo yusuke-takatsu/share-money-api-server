@@ -94,5 +94,5 @@ jobs:
         with:å
           push: true
           context: .
-          file: .docker/${{ needs.check.outputs.env_name }}/php/Dockerfile
+          file: .docker/${{ needs.check.outputs.env_name }}php/Dockerfile
           tags: ${{ secrets.AWS_ECR_ACCOUNT_URL }}/${{ vars.PROJECT }}/${{ needs.check.outputs.env_name }}/app:${{ github.sha }}
