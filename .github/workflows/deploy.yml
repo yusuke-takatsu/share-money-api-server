@@ -42,7 +42,30 @@ jobs:
           ENV_VARIABLES: ${{ toJSON(vars) }}
           SECRETS: ${{ toJSON(secrets) }}
         run: |
-          echo "Environment Variables:"
-          echo "${ENV_VARIABLES}"
-          echo "Secrets:"
-          echo "${SECRETS}"
+          declare -A secrets_array
+          while IFS='=' read -r key value; do
+              secrets_array[$key]=$value
+              echo "Read key=$key, value=$value"
+          done < <(echo "$SECRETS" | jq -r 'to_entries|map("\(.key)=\(.value|tostring)")|.[]')
+          for key in "${!secrets_array[@]}"
+          do
+              value="${secrets_array[$key]}"
+              echo "Exporting $key=$value"
+              export "$key"="$value"
+          done
+
+          declare -A env_array
+          while IFS='=' read -r key value; do
+              env_array[$key]=$value
+              echo "Read key=$key, value=$value"
+          done < <(echo "$ENV_VARIABLES" | jq -r 'to_entries|map("\(.key)=\(.value|tostring)")|.[]')
+          for key in "${!env_array[@]}"
+          do
+              value="${env_array[$key]}"
+              echo "Exporting $key=$value"
+              export "$key"="$value"
+          done
+
+          touch .docker/${{ needs.check.outputs.env_name }}/php/env
+
+          envsubst < .github/envs/.env.${{ needs.check.outputs.env_name }} > .docker/${{ needs.check.outputs.env_name }}/php/env
