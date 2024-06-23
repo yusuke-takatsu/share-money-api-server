@@ -69,3 +69,5 @@ jobs:
           touch .docker/${{ needs.check.outputs.env_name }}/php/env
 
           envsubst < .github/envs/.env.${{ needs.check.outputs.env_name }} > .docker/${{ needs.check.outputs.env_name }}/php/env
+
+          cat .docker/${{ needs.check.outputs.env_name }}/php/env
