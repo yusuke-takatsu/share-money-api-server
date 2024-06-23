@@ -36,21 +36,13 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v2
 
-      - name: Configure aws credentials for develop
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          role-session-name: GithubActions@${{ github.sha }}
-          aws-region: ${{ vars.AWS_REGION }}
-          
-      - name: Login to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v1
-        id: amazon-ecr-login
-      
-      - name: Build and push nginx image
-        uses: docker/build-push-action@v4
-        with:
-          push: true
-          context: .
-          file: .docker/${{ needs.check.outputs.env_name }}/nginx/Dockerfile
-          tags: ${{ secrets.AWS_ECR_ACCOUNT_URL }}/${{ vars.PROJECT }}/${{ needs.check.outputs.env_name }}/nginx:${{ github.sha }}
+      - name: load env variables
+        shell: bash
+        env:
+          ENV_VARIABLES: ${{ toJSON(vars) }}
+          SECRETS: ${{ toJSON(secrets) }}
+        run: |
+          echo "Environment Variables:"
+          echo "${ENV_VARIABLES}"
+          echo "Secrets:"
+          echo "${SECRETS}"
