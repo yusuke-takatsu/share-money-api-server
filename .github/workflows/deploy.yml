@@ -91,8 +91,8 @@ jobs:
     
       - name: Build and push app image
         uses: docker/build-push-action@v4
-        with:å
+        with:
           push: true
           context: .
-          file: .docker/${{ needs.check.outputs.env_name }}php/Dockerfile
+          file: .docker/${{ needs.check.outputs.env_name }}/php/Dockerfile
           tags: ${{ secrets.AWS_ECR_ACCOUNT_URL }}/${{ vars.PROJECT }}/${{ needs.check.outputs.env_name }}/app:${{ github.sha }}
