@@ -1,0 +1,98 @@
+name: deploy
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      env_name: ${{ steps.branch-name-check.outputs.env_name }}
+    steps:
+      - name: Check branch name
+        id: branch-name-check
+        run: |
+          echo "Running on branch ${{ github.ref }}"
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "env_name=production" >> $GITHUB_OUTPUT
+          elif [ "${{ github.ref }}" == "refs/heads/develop" ]; then
+            echo "env_name=develop" >> $GITHUB_OUTPUT
+          elif [ "${{ github.ref }}" == "refs/heads/staging" ]; then
+            echo "env_name=staging" >> $GITHUB_OUTPUT
+          fi
+
+  deploy:
+    needs: check
+    name: Deploy app to AWS Fargate
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: load env variables
+        shell: bash
+        env:
+          ENV_VARIABLES: ${{ toJSON(vars) }}
+          SECRETS: ${{ toJSON(secrets) }}
+        run: |
+          declare -A secrets_array
+          while IFS='=' read -r key value; do
+              secrets_array[$key]=$value
+              echo "Read key=$key, value=$value"
+          done < <(echo "$SECRETS" | jq -r 'to_entries|map("\(.key)=\(.value|tostring)")|.[]')
+          for key in "${!secrets_array[@]}"
+          do
+              value="${secrets_array[$key]}"
+              echo "Exporting $key=$value"
+              export "$key"="$value"
+          done
+
+          declare -A env_array
+          while IFS='=' read -r key value; do
+              env_array[$key]=$value
+              echo "Read key=$key, value=$value"
+          done < <(echo "$ENV_VARIABLES" | jq -r 'to_entries|map("\(.key)=\(.value|tostring)")|.[]')
+          for key in "${!env_array[@]}"
+          do
+              value="${env_array[$key]}"
+              echo "Exporting $key=$value"
+              export "$key"="$value"
+          done
+
+          touch .docker/${{ needs.check.outputs.env_name }}/php/env
+
+          envsubst < .github/envs/.env.${{ needs.check.outputs.env_name }} > .docker/${{ needs.check.outputs.env_name }}/php/env
+
+      - name: Configure aws credentials for develop
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-session-name: GithubActions@${{ github.sha }}
+          aws-region: ${{ vars.AWS_REGION }}
+          
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
+        id: amazon-ecr-login
+      
+      - name: Build and push nginx image
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          context: .
+          file: .docker/${{ needs.check.outputs.env_name }}/nginx/Dockerfile
+          tags: ${{ secrets.AWS_ECR_ACCOUNT_URL }}/${{ vars.PROJECT }}/${{ needs.check.outputs.env_name }}/nginx:${{ github.sha }}
+    
+      - name: Build and push app image
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          context: .
+          file: .docker/${{ needs.check.outputs.env_name }}/php/Dockerfile
+          tags: ${{ secrets.AWS_ECR_ACCOUNT_URL }}/${{ vars.PROJECT }}/${{ needs.check.outputs.env_name }}/app:${{ github.sha }}
