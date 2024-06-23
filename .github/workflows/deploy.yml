@@ -70,4 +70,29 @@ jobs:
 
           envsubst < .github/envs/.env.${{ needs.check.outputs.env_name }} > .docker/${{ needs.check.outputs.env_name }}/php/env
 
-          cat .docker/${{ needs.check.outputs.env_name }}/php/env
+      - name: Configure aws credentials for develop
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-session-name: GithubActions@${{ github.sha }}
+          aws-region: ${{ vars.AWS_REGION }}
+          
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
+        id: amazon-ecr-login
+      
+      - name: Build and push nginx image
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          context: .
+          file: .docker/${{ needs.check.outputs.env_name }}/nginx/Dockerfile
+          tags: ${{ secrets.AWS_ECR_ACCOUNT_URL }}/${{ vars.PROJECT }}/${{ needs.check.outputs.env_name }}/nginx:${{ github.sha }}
+    
+      - name: Build and push app image
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          context: .
+          file: .docker/${{ needs.check.outputs.env_name }}/app/Dockerfile
+          tags: ${{ secrets.AWS_ECR_ACCOUNT_URL }}/${{ vars.PROJECT }}/${{ needs.check.outputs.env_name }}/app:${{ github.sha }}
